@@ -1,40 +1,35 @@
+name: Android Box IPTV APK Build
 
-name: Android Otomatik APK Üretimi
-
-# Hangi durumlarda çalışacağını tetikliyoruz
 on:
   push:
-    branches: [ "main" ] # Kod 'main' dalına push edildiğinde çalışır
+    branches: [ "main", "master" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest # Buluttaki işletim sistemi
+    runs-on: ubuntu-latest
 
     steps:
-    # 1. GitHub'daki kodları bulut makinesine indirir
-    - name: Kodu Çek (Checkout)
+    - name: Checkout Repository
       uses: actions/checkout@v4
 
-    # 2. Java ortamını kurar (Android projenizin ihtiyacına göre sürümü değiştirebilirsiniz)
-    - name: Java JDK 17 Kurulumu
+    - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
-        distribution: 'temurin'
         java-version: '17'
+        distribution: 'temurin'
+        cache: gradle
 
-    # 3. Gradle çalıştırma iznini ayarlar
-    - name: Gradle İzinlerini Ver
+    - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    # 4. Projeyi derler ve Debug APK üretir
-    - name: APK Derleme (Assemble Debug)
-      run: ./gradlew assembleDebug
+    - name: Build Debug APK
+      run: ./gradlew assembleDebug --stacktrace
 
-    # 5. Üretilen APK dosyasını indirilebilir çıktı (Artifact) olarak yükler
-    - name: APK Çıktısını Paylaş
+    - name: Upload Debug APK Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: android-debug-apk
-        path: app/build/outputs/apk/debug/*.apk
+        name: NovaIPTVBox-Debug-APK
+        path: app/build/outputs/apk/debug/app-debug.apk
