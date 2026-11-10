@@ -1,1 +1,40 @@
 
+name: Android Otomatik APK Üretimi
+
+# Hangi durumlarda çalışacağını tetikliyoruz
+on:
+  push:
+    branches: [ "main" ] # Kod 'main' dalına push edildiğinde çalışır
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # Buluttaki işletim sistemi
+
+    steps:
+    # 1. GitHub'daki kodları bulut makinesine indirir
+    - name: Kodu Çek (Checkout)
+      uses: actions/checkout@v4
+
+    # 2. Java ortamını kurar (Android projenizin ihtiyacına göre sürümü değiştirebilirsiniz)
+    - name: Java JDK 17 Kurulumu
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    # 3. Gradle çalıştırma iznini ayarlar
+    - name: Gradle İzinlerini Ver
+      run: chmod +x gradlew
+
+    # 4. Projeyi derler ve Debug APK üretir
+    - name: APK Derleme (Assemble Debug)
+      run: ./gradlew assembleDebug
+
+    # 5. Üretilen APK dosyasını indirilebilir çıktı (Artifact) olarak yükler
+    - name: APK Çıktısını Paylaş
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-debug-apk
+        path: app/build/outputs/apk/debug/*.apk
