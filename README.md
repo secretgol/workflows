@@ -1,10 +1,16 @@
-# IPTV Player (iPhone, SwiftUI, iOS 16+)
+# IPTV Box (Android TV / Android Box, Kotlin + Compose + Media3)
 
-## GitHub ile IPA üretme
-1. GitHub'da yeni bir repo açın ve bu klasörün TÜM içeriğini (`.github` klasörü dahil) yükleyin.
-2. Repo > Actions sekmesi > "Build IPA" > Run workflow (veya main'e push yapın).
-3. İş bitince (yaklaşık 3-5 dk) çalıştırmanın altındaki Artifacts bölümünden `IPTVPlayer-ipa` dosyasını indirin, zip'ten çıkan `IPTVPlayer.ipa` dosyası imzasızdır.
-4. Telefona kurmak için imzalayın: AltStore, Sideloadly veya SideStore ile (ücretsiz Apple ID ile 7 gün geçerli).
+## APK üretme (GitHub)
+1. Yeni boş bir repo açın, bu klasörün TÜM içeriğini repo köküne yükleyin
+   (`settings.gradle.kts`, `app/`, `.github/` yan yana olmalı; `git push` en güvenlisi).
+2. Actions > Build APK > Run workflow.
+3. Bitince Artifacts > `IPTVBox-apk` > zip içinden `app-debug.apk`.
+   (Debug anahtarıyla imzalıdır, doğrudan kurulabilir.)
 
-## Kullanım
-Dişli simgesinden kendi M3U bağlantınızı girin. Kanala dokununca tam ekran oynar, sola kaydırınca favoriye eklenir.
+## Kutuya kurma
+- USB bellek + dosya yöneticisi ile, veya kutuda "Downloader" uygulamasıyla, veya `adb install app-debug.apk`.
+- Ayarlar > Güvenlik > Bilinmeyen kaynaklardan kurulum izni verin.
+
+## Kumanda
+- Yukarı/Aşağı: kanal değiştir (oynatırken) · OK: duraklat/devam · Geri: listeye dön
+- Listede OK basılı tutma: favori ekle/çıkar
