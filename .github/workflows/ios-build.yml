@@ -3,7 +3,7 @@ name: iOS Nova IPTV - Build IPA
 on:
   push:
     branches: [ "main", "master" ]
-  workflow_dispatch:  # Manuel tetikleme butonu
+  workflow_dispatch:
 
 jobs:
   build-ipa:
@@ -34,15 +34,10 @@ jobs:
     - name: Create IPA from .app
       run: |
         cd ios/build/Build/Products/Release-iphoneos
-
-        # IPA = Payload klasörü içine .app koyup zip'lemek
         mkdir -p Payload
         cp -R NovaIPTV.app Payload/
-
-        # .ipa dosyasını oluştur
         zip -r NovaIPTV.ipa Payload/
-        echo "✅ IPA başarıyla oluşturuldu!"
-        ls -lh NovaIPTV.ipa
+        echo "✅ IPA oluşturuldu!"
 
     - name: Upload IPA Artifact
       uses: actions/upload-artifact@v4.6.0
