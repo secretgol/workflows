@@ -11,7 +11,7 @@ const state = {
   favs: new Set(store.get('favs', [])), url: store.get('url', DEFAULT_URL)
 };
 const video = $('#video'), stage = $('#stage');
-let hls = null, hideTimer = null, toastTimer = null;
+let hideTimer = null, toastTimer = null;
 
 /* ---------- M3U ---------- */
 function attr(line, key) {
@@ -71,12 +71,57 @@ function toggleFav(c) {
 }
 
 /* ---------- Oynatma ---------- */
+let engine = null, playId = 0, playedId = 0, methods = [], watchdog = null;
+
 function toast(msg, ms = 3000) {
   const t = $('#toast');
   t.textContent = msg;
   t.classList.add('on');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('on'), ms);
+}
+const isHls = (u) => /\.m3u8(\?|$)/i.test(u);
+function methodsFor(c) {
+  if (isHls(c.url)) return ['hls'];
+  if (/\.(mp4|webm|mkv|mp3|aac)(\?|$)/i.test(c.url)) return ['native'];
+  return ['mpegts', 'hls'];            // uzantisiz / .ts : canli MPEG-TS (Xtream tarzi)
+}
+const hlsUrl = (c) => (isHls(c.url) ? c.url : c.url.replace(/\.ts$/i, '') + '.m3u8');
+
+function stopEngine() {
+  clearTimeout(watchdog);
+  if (engine) { try { engine.destroy(); } catch {} engine = null; }
+  video.removeAttribute('src');
+  video.load();
+}
+function fail(id) {
+  if (id !== playId) return;
+  if (methods.length) return startNext(id);
+  stopEngine();
+  toast('Yayın açılamadı. Hesabınız/bağlantı sınırı aktif mi kontrol edin veya VLC düğmesini deneyin.', 7000);
+}
+function startNext(id) {
+  const c = state.current, kind = methods.shift();
+  stopEngine();
+  if (kind === 'mpegts' && window.mpegts && mpegts.isSupported()) {
+    const p = mpegts.createPlayer({ type: 'mpegts', isLive: true, url: c.url }, { enableWorker: true, liveBufferLatencyChasing: true });
+    p.attachMediaElement(video);
+    p.load();
+    p.on(mpegts.Events.ERROR, () => fail(id));
+    engine = { destroy() { try { p.pause(); p.unload(); p.detachMediaElement(); } catch {} p.destroy(); } };
+  } else if (kind === 'hls' && window.Hls && Hls.isSupported()) {
+    const h = new Hls({ enableWorker: true });
+    h.loadSource(hlsUrl(c));
+    h.attachMedia(video);
+    h.on(Hls.Events.ERROR, (_e, d) => { if (d.fatal) fail(id); });
+    engine = { destroy() { h.destroy(); } };
+  } else if (kind === 'native') {
+    video.src = c.url;
+  } else {
+    return fail(id);
+  }
+  video.play().catch(() => {});
+  watchdog = setTimeout(() => { if (playedId !== id) fail(id); }, 12000);   // 12 sn'de goruntu gelmezse sonraki yontem
 }
 function play(c) {
   state.current = c;
@@ -87,28 +132,16 @@ function play(c) {
   $('#chLogo').innerHTML = `<span>${esc((c.name[0] || '?').toUpperCase())}</span>${c.logo ? `<img src="${esc(c.logo)}" onerror="this.remove()">` : ''}`;
   $('#btnFav').textContent = state.favs.has(c.id) ? '★' : '☆';
   window.api.setHeaders({ referrer: c.referrer, ua: c.ua });
-
-  if (hls) { hls.destroy(); hls = null; }
-  video.removeAttribute('src');
-  video.load();
-
-  if (!/\.m3u8(\?|$)/i.test(c.url)) {
-    video.src = c.url;
-  } else if (window.Hls && Hls.isSupported()) {
-    hls = new Hls({ enableWorker: true });
-    hls.loadSource(c.url);
-    hls.attachMedia(video);
-    hls.on(Hls.Events.ERROR, (_e, d) => { if (d.fatal) toast('Yayın açılamadı. Başka bir kanalı deneyin.', 5000); });
-  } else {
-    video.src = c.url;
-  }
-  video.play().catch(() => {});
+  const id = ++playId;
+  methods = methodsFor(c);
+  startNext(id);
   renderList();
   const el = document.querySelector('.item.on');
   if (el) el.scrollIntoView({ block: 'nearest' });
   showOsd();
 }
-video.addEventListener('error', () => { if (!hls && state.current) toast('Yayın açılamadı.', 4000); });
+video.addEventListener('playing', () => { playedId = playId; });
+video.addEventListener('error', () => { if (state.current && !engine) fail(playId); });
 video.addEventListener('play', () => ($('#btnPlay').textContent = '⏸'));
 video.addEventListener('pause', () => ($('#btnPlay').textContent = '▶'));
 
@@ -129,17 +162,31 @@ function toggleMute() { video.muted = !video.muted; $('#btnMute').textContent = 
 /* ---------- Yukleme ---------- */
 async function load() {
   toast('Kanal listesi yükleniyor…', 8000);
-  let text = null;
+  let text = '';
   if (state.url !== '__local__') {
-    try { text = await window.api.fetchText(state.url); store.set('cache', text); }
+    try { text = await window.api.fetchText(state.url); window.api.cacheWrite(text); }
     catch (e) { toast('Liste indirilemedi (' + e.message + '). Kayıtlı liste kullanılıyor.', 5000); }
   }
-  if (!text) text = store.get('cache', '');
+  if (!text) text = await window.api.cacheRead();
   state.channels = parse(text);
-  if (!state.channels.length) toast('Kanal bulunamadı. Ayarlar’dan bir M3U bağlantısı girin.', 6000);
-  else if (text) toast(state.channels.length + ' kanal yüklendi');
+  if (!state.channels.length) {
+    $('#empty').style.display = '';
+    toast('Kanal bulunamadı. Bir M3U dosyası seçin veya Ayarlar’dan bağlantı girin.', 6000);
+  } else if (text) toast(state.channels.length + ' kanal yüklendi');
   renderGroups();
   applyFilter();
+}
+function importFile(f) {
+  const r = new FileReader();
+  r.onload = async () => {
+    await window.api.cacheWrite(r.result);
+    state.url = '__local__';
+    store.set('url', state.url);
+    state.group = 'Tümü';
+    if (dlg.open) dlg.close();
+    load();
+  };
+  r.readAsText(f);
 }
 
 /* ---------- Olaylar ---------- */
@@ -173,12 +220,14 @@ $('#btnSettings').onclick = () => { $('#urlInput').value = state.url === '__loca
 $('#dlgCancel').onclick = () => dlg.close();
 $('#btnDefault').onclick = () => { $('#urlInput').value = DEFAULT_URL; };
 $('#btnFile').onclick = () => $('#fileInput').click();
-$('#fileInput').onchange = (e) => {
-  const f = e.target.files[0];
-  if (!f) return;
-  const r = new FileReader();
-  r.onload = () => { store.set('cache', r.result); state.url = '__local__'; store.set('url', state.url); dlg.close(); load(); };
-  r.readAsText(f);
+$('#fileInput').onchange = (e) => { const f = e.target.files[0]; if (f) importFile(f); e.target.value = ''; };
+$('#btnOpen').onclick = () => $('#fileInput').click();
+document.addEventListener('dragover', (e) => e.preventDefault());
+document.addEventListener('drop', (e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) importFile(f); });
+$('#btnVlc').onclick = async () => {
+  if (!state.current) return;
+  const ok = await window.api.openVlc(state.current.url);
+  toast(ok ? 'VLC’de açılıyor…' : 'VLC bulunamadı. videolan.org adresinden kurabilirsiniz.', 4000);
 };
 $('#dlgSave').onclick = () => {
   const v = $('#urlInput').value.trim();

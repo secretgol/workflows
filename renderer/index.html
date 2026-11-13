@@ -24,7 +24,8 @@
     <div class="empty" id="empty">
       <div class="big">📺</div>
       <div>Soldaki listeden bir kanal seçin</div>
-      <small>↑ ↓ kanal değiştir · Boşluk duraklat · F tam ekran · M sessiz</small>
+      <button id="btnOpen" class="primary">M3U dosyası seç…</button>
+      <small>Dosyayı pencereye sürükleyip bırakabilirsiniz · ↑ ↓ kanal · Boşluk duraklat · F tam ekran · M sessiz</small>
     </div>
     <div class="osd top" id="osdTop">
       <div class="logo big-logo" id="chLogo"></div>
@@ -36,6 +37,7 @@
       <button id="btnMute" class="ico">🔊</button>
       <input id="vol" type="range" min="0" max="1" step="0.05" value="1">
       <span class="grow"></span>
+      <button id="btnVlc" class="ico vlc" title="VLC'de aç">VLC</button>
       <button id="btnPip" class="ico" title="Küçük pencere">⧉</button>
       <button id="btnFs" class="ico" title="Tam ekran">⛶</button>
     </div>
@@ -60,6 +62,7 @@
 </dialog>
 
 <script src="../node_modules/hls.js/dist/hls.min.js"></script>
+<script src="../node_modules/mpegts.js/dist/mpegts.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

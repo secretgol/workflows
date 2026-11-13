@@ -1,15 +1,16 @@
 {
   "name": "telebox",
-  "version": "1.0.0",
-  "description": "TeleBox - IPTV oynatici",
+  "version": "1.1.0",
+  "description": "TeleBox - Windows IPTV oynatici",
   "author": "TeleBox",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder --publish never"
+    "dist": "electron-builder --win --publish never"
   },
   "dependencies": {
-    "hls.js": "1.5.17"
+    "hls.js": "1.5.17",
+    "mpegts.js": "1.7.3"
   },
   "devDependencies": {
     "electron": "^33.2.0",
@@ -19,8 +20,6 @@
     "appId": "com.example.telebox",
     "productName": "TeleBox",
     "files": ["main.js", "preload.js", "renderer/**/*"],
-    "win": { "target": "portable", "artifactName": "TeleBox-${version}-portable.exe" },
-    "mac": { "target": "dmg", "identity": null, "category": "public.app-category.entertainment" },
-    "linux": { "target": "AppImage", "category": "AudioVideo" }
+    "win": { "target": "portable", "artifactName": "TeleBox-${version}-portable.exe" }
   }
 }
