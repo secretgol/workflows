@@ -1,0 +1,26 @@
+{
+  "name": "telebox",
+  "version": "1.0.0",
+  "description": "TeleBox - IPTV oynatici",
+  "author": "TeleBox",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --publish never"
+  },
+  "dependencies": {
+    "hls.js": "1.5.17"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.example.telebox",
+    "productName": "TeleBox",
+    "files": ["main.js", "preload.js", "renderer/**/*"],
+    "win": { "target": "portable", "artifactName": "TeleBox-${version}-portable.exe" },
+    "mac": { "target": "dmg", "identity": null, "category": "public.app-category.entertainment" },
+    "linux": { "target": "AppImage", "category": "AudioVideo" }
+  }
+}

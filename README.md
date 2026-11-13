@@ -1,16 +1,18 @@
-# IPTV Box (Android TV / Android Box, Kotlin + Compose + Media3)
+# TeleBox - IPTV oynatıcı (Windows / macOS / Linux)
 
-## APK üretme (GitHub)
-1. Yeni boş bir repo açın, bu klasörün TÜM içeriğini repo köküne yükleyin
-   (`settings.gradle.kts`, `app/`, `.github/` yan yana olmalı; `git push` en güvenlisi).
-2. Actions > Build APK > Run workflow.
-3. Bitince Artifacts > `IPTVBox-apk` > zip içinden `app-debug.apk`.
-   (Debug anahtarıyla imzalıdır, doğrudan kurulabilir.)
+## Hızlı çalıştırma (Node.js 18+ kuruluysa)
+    npm install
+    npm start
 
-## Kutuya kurma
-- USB bellek + dosya yöneticisi ile, veya kutuda "Downloader" uygulamasıyla, veya `adb install app-debug.apk`.
-- Ayarlar > Güvenlik > Bilinmeyen kaynaklardan kurulum izni verin.
+## Tek tıkla çalışan program üretme (GitHub)
+1. Yeni boş repo açın, bu klasörün TÜM içeriğini (`.github` dahil) repo köküne yükleyin.
+2. Actions > Build Desktop > Run workflow.
+3. Bitince Artifacts'tan indirin: Windows `.exe` (kurulumsuz), Linux `.AppImage`, macOS `.dmg`.
 
-## Kumanda
-- Yukarı/Aşağı: kanal değiştir (oynatırken) · OK: duraklat/devam · Geri: listeye dön
-- Listede OK basılı tutma: favori ekle/çıkar
+## Kanal listesi
+Varsayılan: iptv-org Türkiye listesi (https://iptv-org.github.io/iptv/countries/tr.m3u).
+Her açılışta güncel liste indirilir; internet yoksa son kayıtlı liste kullanılır.
+Ayarlar'dan kendi M3U bağlantınızı girebilir veya dosyadan yükleyebilirsiniz.
+
+## Kısayollar
+↑ ↓ kanal değiştir · Boşluk duraklat · F tam ekran · M sessiz · çift tık tam ekran

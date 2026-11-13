@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>TeleBox</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand"><span class="dot"></span>Tele<b>Box</b></div>
+    <input id="q" placeholder="Kanal ara…" autocomplete="off">
+    <div id="groups" class="chips"></div>
+    <div class="count" id="count"></div>
+    <div id="list" class="list"></div>
+    <div class="foot">
+      <button id="btnSettings">⚙ Ayarlar</button>
+      <button id="btnReload" title="Listeyi yenile">⟳ Yenile</button>
+    </div>
+  </aside>
+
+  <main class="stage" id="stage">
+    <video id="video" autoplay></video>
+    <div class="empty" id="empty">
+      <div class="big">📺</div>
+      <div>Soldaki listeden bir kanal seçin</div>
+      <small>↑ ↓ kanal değiştir · Boşluk duraklat · F tam ekran · M sessiz</small>
+    </div>
+    <div class="osd top" id="osdTop">
+      <div class="logo big-logo" id="chLogo"></div>
+      <div class="info"><div id="chName"></div><div id="chGroup"></div></div>
+      <button id="btnFav" class="ico" title="Favori">☆</button>
+    </div>
+    <div class="osd bottom" id="osdBottom">
+      <button id="btnPlay" class="ico">⏸</button>
+      <button id="btnMute" class="ico">🔊</button>
+      <input id="vol" type="range" min="0" max="1" step="0.05" value="1">
+      <span class="grow"></span>
+      <button id="btnPip" class="ico" title="Küçük pencere">⧉</button>
+      <button id="btnFs" class="ico" title="Tam ekran">⛶</button>
+    </div>
+    <div class="toast" id="toast"></div>
+  </main>
+</div>
+
+<dialog id="dlg">
+  <h3>Ayarlar</h3>
+  <label>M3U liste bağlantısı</label>
+  <input id="urlInput" placeholder="https://...m3u">
+  <div class="row">
+    <button id="btnDefault">Türkiye listesini kullan</button>
+    <button id="btnFile">Dosyadan yükle…</button>
+    <input type="file" id="fileInput" accept=".m3u,.m3u8,.txt" hidden>
+  </div>
+  <small>Varsayılan: iptv-org Türkiye listesi (her açılışta güncellenir, çevrimdışıyken son kayıtlı liste kullanılır).</small>
+  <div class="row end">
+    <button id="dlgCancel">İptal</button>
+    <button id="dlgSave" class="primary">Kaydet ve Yükle</button>
+  </div>
+</dialog>
+
+<script src="../node_modules/hls.js/dist/hls.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
