@@ -76,3 +76,7 @@ makinesinde projeyi derler ve imzasız bir IPA üretir.
 ## Lisans
 
 Yazı tipleri Outfit ve Inter, SIL Open Font License ile lisanslıdır. Dağıtımda OFL metnini ekleyin.
+
+
+## Not (Info.plist)
+Info.plist artık `project.yml` içindeki `info.properties` bölümünden üretilir (XcodeGen dosyanın üzerine yazdığı için). Yazı tipi, http izni ve yatay yön ayarlarını orada değiştirin.
