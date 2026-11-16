@@ -20,6 +20,12 @@ Renkler ekran görüntülerinden piksel düzeyinde ölçüldü (`Theme/Theme.swi
 zemin `#0B0F1A`, kenar çubuğu `#06070C`, kart `#131720`, seçili yeşil `#87ECAA`,
 LIVE rozeti `#EB6280`, IMDb rozeti `#F5C518`. Yazı tipleri Outfit (başlık) ve Inter (metin).
 
+## Logo
+
+Uygulama logosu `Assets.xcassets/` içinde: uygulama simgesi (`AppIcon`, 1024 px, opak) ve
+kenar çubuğu ile ayarlarda kullanılan logo (`Logo`, şeffaf PNG). Logo, uygulamanın lacivert ve yeşil
+paletiyle çizildi, IPVIO logosuyla ilgisi yok.
+
 ## Telif ve marka
 
 Ekran görüntülerindeki film posterleri, kanal logoları ve uygulama logosu projeye alınmadı.
@@ -39,6 +45,15 @@ Gereksinimler: macOS, Xcode 15+, iOS 17+.
 5. iPad veya yatay iPhone simülatöründe çalıştırın (⌘R). Sol kenar çubuğu geniş ekran için tasarlandı.
 6. Ayarlar > Playlists bölümünden kendi M3U adresinizi girip yükleyin.
 
+
+
+## iPhone ve iPad düzeni
+
+- **iPhone (dar ekran):** Alt sekmeler: Ana Sayfa, Canlı TV, Filmler, Diziler, Ayarlar. Menüler
+  düz listelerdir. Kanala tek dokunuşla oynatıcı açılır.
+- **iPad (geniş ekran):** Sol kenar çubuğu düzeni.
+
+Oynatıcı artık bağlantı hatasını ekranda gösterir. Yayın açılmazsa neden yazılır.
 
 ## GitHub'dan IPA üretme
 
@@ -76,7 +91,3 @@ makinesinde projeyi derler ve imzasız bir IPA üretir.
 ## Lisans
 
 Yazı tipleri Outfit ve Inter, SIL Open Font License ile lisanslıdır. Dağıtımda OFL metnini ekleyin.
-
-
-## Not (Info.plist)
-Info.plist artık `project.yml` içindeki `info.properties` bölümünden üretilir (XcodeGen dosyanın üzerine yazdığı için). Yazı tipi, http izni ve yatay yön ayarlarını orada değiştirin.

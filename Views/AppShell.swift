@@ -67,10 +67,10 @@ struct SideRail: View {
 
     var body: some View {
         VStack(spacing: 14) {
-            // Uygulama işareti: IPVIO logosu değil, nötr bir simge.
-            Image(systemName: "play.square.stack")
-                .font(.system(size: 26))
-                .foregroundStyle(VSColor.accent)
+            Image("Logo")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 40, height: 40)
                 .padding(.bottom, 14)
 
             ForEach(items) { route in

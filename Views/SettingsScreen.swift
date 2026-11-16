@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsScreen: View {
     @EnvironmentObject private var store: PlaylistStore
+    @AppStorage("accent") private var accentRaw = AccentChoice.green.rawValue
     @AppStorage("playlistURL") private var playlistURL = ""
     @State private var showPlaylist = false
 
