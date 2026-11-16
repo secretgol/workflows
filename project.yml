@@ -23,9 +23,35 @@ targets:
       - path: Resources/Fonts
     info:
       path: Resources/Info.plist
+      properties:
+        CFBundleDisplayName: Stream Player
+        UIAppFonts:
+          - Outfit-Regular.ttf
+          - Outfit-Bold.ttf
+          - Inter-Regular.otf
+          - Inter-Medium.otf
+          - Inter-SemiBold.otf
+          - Inter-Bold.otf
+          - Inter-ExtraBold.otf
+        # Kullanicinin kendi http (duz) M3U/yayin adresleri icin
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true
+        UIBackgroundModes:
+          - audio
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+          - UIInterfaceOrientationPortrait
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+        UIRequiredDeviceCapabilities:
+          - arm64
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.example.streamplayer
         GENERATE_INFOPLIST_FILE: NO
         TARGETED_DEVICE_FAMILY: "1,2"
-        INFOPLIST_FILE: Resources/Info.plist
