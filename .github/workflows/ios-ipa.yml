@@ -20,6 +20,7 @@ jobs:
 
       - name: Derle (imzasız, cihaz için)
         run: |
+          set -o pipefail
           xcodebuild \
             -project StreamPlayer.xcodeproj \
             -scheme StreamPlayer \
@@ -30,7 +31,12 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            clean build
+            clean build 2>&1 | tee build.log
+
+      - name: Hata özeti
+        if: failure()
+        run: |
+          grep -nE "error:" build.log | head -40 || true
 
       - name: IPA paketle
         run: |
