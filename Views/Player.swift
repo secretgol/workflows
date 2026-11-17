@@ -173,9 +173,14 @@ final class VLCPlaybackModel: NSObject, ObservableObject, VLCMediaPlayerDelegate
     }
 
     private func refreshTracks() {
-        func options(_ names: [String]?, _ indexes: [NSNumber]?) -> [TrackOption] {
+        // VLC bu listeleri [Any] döndürür; NSNumber/String'e çeviririz.
+        func options(_ names: [Any]?, _ indexes: [Any]?) -> [TrackOption] {
             guard let names, let indexes else { return [] }
-            return zip(names, indexes).map { TrackOption(index: $1.int32Value, name: $0) }
+            return zip(names, indexes).compactMap { rawName, rawIndex in
+                guard let index = (rawIndex as? NSNumber)?.int32Value else { return nil }
+                let name = rawName as? String ?? "Parça \(index)"
+                return TrackOption(index: index, name: name)
+            }
         }
         audioTracks = options(player.audioTrackNames, player.audioTrackIndexes)
         subtitleTracks = options(player.videoSubTitlesNames, player.videoSubTitlesIndexes)
