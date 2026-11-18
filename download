@@ -1,0 +1,6 @@
+# Xcode projesi XcodeGen ile üretilir (project.yml)
+*.xcodeproj/
+build/
+DerivedData/
+Pods/
+.DS_Store

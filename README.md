@@ -36,12 +36,12 @@ ve kendi logonuzu ekleyin.
 
 Uygulama kendi başına hiçbir içerik sunmaz; üç kaynağı destekler:
 
-1. **Ulusal kanallar (hazır):** Ayarlar › Liste bölümünden tek dokunuşla iptv-org'un
+1. **Xtream Codes (önerilen):** Sunucu adresi, kullanıcı adı ve şifreyle canlı + film + dizi
+   listeleri; dizilerde gerçek sezon ve bölümler. **Kapak ve afiş resimleri bu yöntemle gelir.**
+2. **Ulusal kanallar (hazır):** Ayarlar › Liste bölümünden tek dokunuşla iptv-org'un
    Türkiye listesi (TRT 1, ATV, Kanal D, NOW, Show, Star, TV8 vb. 100+ kanal) yüklenir.
-2. **Kendi M3U listeniz:** http(s) .m3u/.m3u8 adresi. `#EXTVLCOPT` satırlarındaki
-   user-agent ve referrer bilgileri de oynatıcıya iletilir.
-3. **Xtream Codes:** Sunucu adresi, kullanıcı adı ve şifreyle canlı + film + dizi
-   listeleri; dizilerde gerçek sezon ve bölümler.
+3. **M3U listeniz:** http(s) .m3u/.m3u8 adresi. `tvg-logo` taşıyorsa afiş gösterir;
+   `#EXTVLCOPT` satırlarındaki user-agent ve referrer bilgileri de oynatıcıya iletilir.
 
 ## Xcode'da kurulum
 
