@@ -109,6 +109,16 @@ struct PosterTile: View {
                       colors: [Color(hex: 0x1B2236), Color(hex: 0x2B3550)])
                 .aspectRatio(2 / 3, contentMode: .fit)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay(alignment: .topLeading) {
+                    if let rating = item.rating {
+                        Text(String(format: "%.0f", rating))
+                            .font(VSFont.inter(11, weight: "Bold"))
+                            .foregroundStyle(.white)
+                            .frame(width: 22, height: 22)
+                            .background(Circle().fill(Color(hex: 0x2E7CD6)))
+                            .padding(6)
+                    }
+                }
             Text(item.name)
                 .font(VSFont.inter(13, weight: "SemiBold"))
                 .foregroundStyle(.white)

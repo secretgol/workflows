@@ -182,7 +182,8 @@ final class XtreamClient {
                     logo: Self.tolerantURL(icon),
                     stream: creds.streamURL(root: "movie", id: id, ext: ext),
                     kind: .movie,
-                    summary: row.string("plot")))
+                    summary: row.string("plot"),
+                    rating: Self.ratingValue(row)))
             case .series:
                 out.append(MediaItem(
                     id: "xt-series-\(id)", name: name, group: group,
@@ -190,7 +191,8 @@ final class XtreamClient {
                     stream: creds.streamURL(root: "series", id: id, ext: "mp4"),
                     kind: .series,
                     xtreamSeriesID: id,
-                    summary: row.string("plot")))
+                    summary: row.string("plot"),
+                    rating: Self.ratingValue(row)))
             }
         }
         return out
@@ -230,6 +232,13 @@ final class XtreamClient {
             bySeason[season] = rows
         }
         return (bySeason.keys.sorted(), bySeason)
+    }
+
+    /// Sağlayıcının verdiği puanı sayıya çevirir (afiş rozeti için).
+    static func ratingValue(_ row: [String: Any]) -> Double? {
+        if let d = row["rating"] as? Double { return d }
+        if let s = row.string("rating") { return Double(s) }
+        return nil
     }
 
     /// Boşluk veya Türkçe karakter içeren adresleri de kabul eder.

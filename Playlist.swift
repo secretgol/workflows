@@ -15,12 +15,14 @@ struct MediaItem: Identifiable, Hashable {
     let referrer: String?
     /// Kısa açıklama (Xtream dizilerindeki plot alanı). M3U'da yoktur.
     let summary: String?
+    /// Xtream puanı (afişin sol üstündeki mavi rozet). M3U'da yoktur.
+    let rating: Double?
     /// Xtream Codes dizisinin ID'si; gerçek sezon/bölüm listesi bununla çekilir.
     let xtreamSeriesID: Int?
 
     init(id: String, name: String, group: String, logo: URL?, stream: URL, kind: Kind,
          userAgent: String? = nil, referrer: String? = nil, xtreamSeriesID: Int? = nil,
-         summary: String? = nil) {
+         summary: String? = nil, rating: Double? = nil) {
         self.id = id
         self.name = name
         self.group = group
@@ -31,6 +33,7 @@ struct MediaItem: Identifiable, Hashable {
         self.referrer = referrer
         self.xtreamSeriesID = xtreamSeriesID
         self.summary = summary
+        self.rating = rating
     }
 }
 

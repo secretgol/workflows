@@ -150,15 +150,30 @@ struct RailHeader: View {
     let title: String
     let destination: Route
 
+    private var destinationView: some View {
+        switch destination {
+        case .live: return AnyView(LiveTVScreen())
+        case .movies: return AnyView(CategoriesScreen(kind: .movie))
+        case .series: return AnyView(CategoriesScreen(kind: .series))
+        default: return AnyView(PlaceholderScreen(title: destination.title))
+        }
+    }
+
     var body: some View {
         HStack {
             Text(title)
                 .font(VSFont.outfit(24, bold: true))
                 .foregroundStyle(.white)
             Spacer()
-            Text("Tümünü göster")
-                .font(VSFont.inter(14, weight: "Medium"))
-                .foregroundStyle(VSColor.textMuted)
+            NavigationLink { destinationView } label: {
+                HStack(spacing: 4) {
+                    Text("Tümünü göster")
+                        .font(VSFont.inter(14, weight: "Medium"))
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 11, weight: .semibold))
+                }
+                .foregroundStyle(VSColor.accent)
+            }
         }
         .padding(.horizontal, 28)
     }
