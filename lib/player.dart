@@ -30,6 +30,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
   int _variantIdx = 0;
 
   StreamSubscription<String>? _errSub;
+  StreamSubscription<bool>? _playSub;
   Timer? _saveTimer;
   Timer? _sleepTimer;
   int _sleepMinutes = 0;
@@ -43,14 +44,19 @@ class _PlayerScreenState extends State<PlayerScreen> {
     _cur = widget.item;
     _zapIdx = widget.item.zapIndex;
     _errSub = player.stream.error.listen((e) {
-      if (mounted && e.isNotEmpty) setState(() => _error = e);
+      final low = e.toLowerCase();
+      if (e.isEmpty || low.contains('force-seekable') || low.contains('cannot seek')) return;
+      if (mounted) setState(() => _error = e);
+    });
+    _playSub = player.stream.playing.listen((isPlaying) {
+      if (isPlaying && _error != null && mounted) setState(() => _error = null);
     });
     _start();
   }
 
   Future<void> _start({String? overrideUrl}) async {
     if (mounted && _error != null) setState(() => _error = null);
-    var start = Duration.zero;
+    Duration? start;
     if (!_cur.isLive && overrideUrl == null) {
       final h = await Db.progress(widget.state.profile.id, _cur.key);
       if (h != null && h.pos > 10 && (h.dur == 0 || h.pos < h.dur * 0.95)) start = Duration(seconds: h.pos);
@@ -172,6 +178,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
   @override
   void dispose() {
     _errSub?.cancel();
+    _playSub?.cancel();
     _saveTimer?.cancel();
     _sleepTimer?.cancel();
     _focus.dispose();
