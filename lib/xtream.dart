@@ -84,6 +84,9 @@ Future<List<MediaItem>> loadXtreamItems(Source s, String kind) async {
 }
 
 String movieUrl(Source s, MediaItem m) {
+  if (m.ext == 'direct' || m.extId.startsWith('http://') || m.extId.startsWith('https://')) {
+    return m.extId;
+  }
   if (s.type == 'jellyfin') {
     return '${_base(s)}/Videos/${m.extId}/stream?static=true&api_key=${Uri.encodeComponent(s.pass)}';
   }
@@ -143,7 +146,7 @@ Future<List<Channel>> loadJellyfinChannels(Source s) async {
   final base = _base(s);
   final key = Uri.encodeComponent(s.pass);
   final r = await http.get(Uri.parse('$base/LiveTv/Channels?api_key=$key'), headers: _headers(s)).timeout(_t);
-  if (r.statusCode < 200 || r.statusCode >= 300) return [];
+  if (r.statusCode < 200 || r.statusCode >= 300) throw Exception('Jellyfin HTTP ${r.statusCode}');
   final j = jsonDecode(utf8.decode(r.bodyBytes, allowMalformed: true));
   final list = (j is Map && j['Items'] is List) ? j['Items'] as List : const [];
   return [

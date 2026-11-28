@@ -1,5 +1,9 @@
+import 'dart:io';
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'models.dart';
 import 'store.dart';
 import 'theme.dart';
@@ -158,8 +162,64 @@ class SettingsView extends StatelessWidget {
                       'jellyfin' => 'Sunucu adresi (http://host:8096)',
                       _ => 'Sunucu (http://host:port)',
                     },
+                    suffixIcon: type == 'local_m3u'
+                        ? IconButton(
+                            icon: const Icon(Icons.folder_open_rounded, color: kCyan),
+                            tooltip: 'Dosya Seç',
+                            onPressed: () async {
+                              const tg = XTypeGroup(label: 'M3U Playlist', extensions: ['m3u', 'm3u8', 'txt']);
+                              final f = await openFile(acceptedTypeGroups: const [tg]);
+                              if (f == null) return;
+                              String chosenPath = f.path;
+                              if (Platform.isIOS || Platform.isAndroid) {
+                                final base = await getApplicationSupportDirectory();
+                                final dir = Directory(p.join(base.path, 'playlists'));
+                                if (!await dir.exists()) await dir.create(recursive: true);
+                                final dest = File(p.join(dir.path, '${DateTime.now().millisecondsSinceEpoch}_${f.name}'));
+                                await dest.writeAsBytes(await f.readAsBytes());
+                                chosenPath = dest.path;
+                              }
+                              set(() {
+                                url.text = chosenPath;
+                                if (name.text.trim().isEmpty) {
+                                  name.text = p.basenameWithoutExtension(f.name);
+                                }
+                              });
+                            },
+                          )
+                        : null,
                   ),
                 ),
+                if (type == 'local_m3u') ...[
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.folder_open_rounded, size: 18, color: kCyan),
+                      label: const Text('Bilgisayardan / Cihazdan Dosya Seç'),
+                      onPressed: () async {
+                        const tg = XTypeGroup(label: 'M3U Playlist', extensions: ['m3u', 'm3u8', 'txt']);
+                        final f = await openFile(acceptedTypeGroups: const [tg]);
+                        if (f == null) return;
+                        String chosenPath = f.path;
+                        if (Platform.isIOS || Platform.isAndroid) {
+                          final base = await getApplicationSupportDirectory();
+                          final dir = Directory(p.join(base.path, 'playlists'));
+                          if (!await dir.exists()) await dir.create(recursive: true);
+                          final dest = File(p.join(dir.path, '${DateTime.now().millisecondsSinceEpoch}_${f.name}'));
+                          await dest.writeAsBytes(await f.readAsBytes());
+                          chosenPath = dest.path;
+                        }
+                        set(() {
+                          url.text = chosenPath;
+                          if (name.text.trim().isEmpty) {
+                            name.text = p.basenameWithoutExtension(f.name);
+                          }
+                        });
+                      },
+                    ),
+                  ),
+                ],
                 if (type == 'xtream') ...[
                   const SizedBox(height: 10),
                   TextField(controller: user, decoration: const InputDecoration(labelText: 'Kullanıcı adı')),
@@ -412,6 +472,22 @@ class SettingsView extends StatelessWidget {
                 onTap: () async {
                   final path = await s.saveBackupFile();
                   if (context.mounted) _snack(context, 'Kaydedildi: $path');
+                },
+              ),
+              const Divider(height: 1),
+              ListTile(
+                leading: const Icon(Icons.folder_open_rounded, color: kOk),
+                title: const Text('Yedek dosyasından içe aktar (.json)'),
+                onTap: () async {
+                  const tg = XTypeGroup(label: 'JSON Yedek', extensions: ['json']);
+                  final f = await openFile(acceptedTypeGroups: const [tg]);
+                  if (f == null) return;
+                  try {
+                    await s.importBackupJson(await f.readAsString());
+                    if (context.mounted) _snack(context, 'Yedek başarıyla yüklendi.');
+                  } catch (e) {
+                    if (context.mounted) _snack(context, 'Geçersiz yedek dosyası: $e');
+                  }
                 },
               ),
               const Divider(height: 1),

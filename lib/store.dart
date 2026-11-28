@@ -188,6 +188,7 @@ class AppState extends ChangeNotifier {
     error = null;
     notifyListeners();
     String? epg = s.epgUrl.isEmpty ? null : s.epgUrl;
+    List<MediaItem> m3uMovies = const [];
     try {
       List<Channel> list;
       if (s.type == 'xtream') {
@@ -201,15 +202,33 @@ class AppState extends ChangeNotifier {
         final bytes = await f.readAsBytes();
         final res = await compute(parseM3uBytes, bytes);
         list = res.channels;
+        m3uMovies = res.movies;
         if (res.epgUrl.isNotEmpty) epg ??= res.epgUrl;
       } else {
         final r = await http.get(Uri.parse(s.url), headers: {'User-Agent': s.effectiveUa}).timeout(const Duration(seconds: 90));
         if (r.statusCode < 200 || r.statusCode >= 300) throw Exception('HTTP ${r.statusCode}');
         final res = await compute(parseM3uBytes, r.bodyBytes);
         list = res.channels;
+        m3uMovies = res.movies;
         if (res.epgUrl.isNotEmpty) epg ??= res.epgUrl;
       }
       await Db.replaceChannels(s.id, list);
+      if (m3uMovies.isNotEmpty) {
+        final tagged = [
+          for (final m in m3uMovies)
+            MediaItem(
+              sourceId: s.id,
+              kind: 'movie',
+              extId: m.extId,
+              name: m.name,
+              cat: m.cat,
+              poster: m.poster,
+              ext: 'direct',
+            )
+        ];
+        await Db.replaceItems(s.id, 'movie', tagged);
+        vodVersion++;
+      }
       await _prefs.setInt('last_${s.id}', DateTime.now().millisecondsSinceEpoch);
       loading = false;
       dataVersion++;
