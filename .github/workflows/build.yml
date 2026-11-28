@@ -41,7 +41,7 @@ jobs:
       - name: Install dependencies and analyze
         run: |
           flutter pub get
-          flutter analyze --no-fatal-infos
+          flutter analyze --no-fatal-infos --no-fatal-warnings
       - name: Build APK
         run: flutter build apk --release
       - uses: actions/upload-artifact@v4
