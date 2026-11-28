@@ -37,6 +37,19 @@ jobs:
           if 'android:usesCleartextTraffic=' not in txt:
               txt = txt.replace("<application", '<application\n        android:usesCleartextTraffic="true"', 1)
           p.write_text(txt, encoding="utf-8")
+
+          # Disable AGP lintVitalRelease crash (JavaDocParser NoSuchMethodError)
+          for gname in ("android/app/build.gradle.kts", "android/app/build.gradle"):
+              gp = Path(gname)
+              if gp.exists():
+                  gt = gp.read_text(encoding="utf-8")
+                  if "checkReleaseBuilds" not in gt and "android {" in gt:
+                      gt = gt.replace(
+                          "android {",
+                          "android {\n    lint {\n        checkReleaseBuilds = false\n        abortOnError = false\n    }",
+                          1,
+                      )
+                      gp.write_text(gt, encoding="utf-8")
           PY
       - name: Install dependencies and analyze
         run: |
